@@ -9,8 +9,6 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 // time.
 const TOKEN_PATH = 'token.json';
  
-    
-
 getCredentials = (callback) => {
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
@@ -20,7 +18,6 @@ fs.readFile('credentials.json', (err, content) => {
     });
 }    
 
-    
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -31,7 +28,7 @@ async function authorize(credentials, callback) {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
         client_id, client_secret, redirect_uris[0]);
-  
+
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getAccessToken(oAuth2Client, callback);
@@ -79,34 +76,42 @@ function getAccessToken(oAuth2Client, callback) {
 function listFiles(searchText, callback, errorCalback) {
     let folderId = "1ZJjJYVXuPIpCJ4ISHEBsD5xIkyn0JlUk";
     getCredentials((auth) => {
+        console.log("I'm authenticated");
+
         const resource = {
             auth,
             id: folderId,
-            fields: "files(name,id, mimeType, webViewLink)",
+            fields: "files(name, id, mimeType, webViewLink)",
           };
-          
 
         getfilelist.GetFileList(resource, function (err, res) {
-            // or getfilelist.GetFolderTree(resource, function(err, res) {
+            console.log("getting file list");
             if (err) {
               console.log(err);
+              errorCalback("ops, algo deu errado!")
               return;
             }
-
+            
             var files = []
             res.fileList.forEach(element => {
                 let filesFrom = getAlikeFiles(searchText, element.files)
                 files.push(...filesFrom)
             });
-            callback(files)
+             
+            files.length == 0 ? errorCalback("Não achei livros com esse termo") : callback(files)
           });
     });
 }
 
 function getAlikeFiles(searchText, files) {
     var items = []
+    console.log("looking for files");
     files.forEach(file => {
-        if(file.name.toLowerCase().includes(searchText.toLowerCase()) && file.mimeType == "application/pdf") {
+        var testForName = file.name.toLowerCase().includes(searchText.toLowerCase())
+        console.log("is search term contained: " + testForName);
+        var testForType = file.mimeType.includes("application/pdf")
+        console.log("is file a pdf: " + testForType);
+        if(testForName && testForType) {
             items.push(file)
         }
     })
