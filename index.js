@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const DriveAPi = require('./DriveAPi');
 const client = new Discord.Client();
 
-client.login("NzA0ODAwNzM3ODMzNTE3MTQ2.Xqia1g.gsf-b2N9RDuAXCCDgl-BeitUeE0")
+client.login("NzA0ODAwNzM3ODMzNTE3MTQ2.Xqia1g.Px6oUTvtANM19DaKbn3r_GYt7FE")
 
 var prefix = "!fey"
 
